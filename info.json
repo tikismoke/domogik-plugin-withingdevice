@@ -1,24 +1,17 @@
 {
     "configuration": [{
-        "description": "client_id of your xee dev apps account",
-        "key": "client_id",
-        "name": "Client ID",
+        "description": "api_key of your withing dev apps account",
+        "key": "api_key",
+        "name": "API key",
         "required": "yes",
         "default": "",
         "type": "string"
     }, {
-        "description": "client_secret of your xee dev apps account",
-        "key": "client_secret",
-        "name": "Client SECRET",
+        "description": "api_secret of your withing dev apps account",
+        "key": "api_secret",
+        "name": "API SECRET",
         "required": "yes",
         "default": "",
-        "type": "string"
-    }, {
-        "description": "redirect url of your xee dev apps account",
-        "key": "redirect_url",
-        "name": "Redirect URL",
-        "required": "yes",
-        "default": "http://localhost",
         "type": "string"
     }, {
     	"description": "Refresh period in seconds",
@@ -31,8 +24,8 @@
     "commands": {},
     "xpl_commands": {},
     "sensors": {
-	"carid": {
-	    "name": "Car ID",
+	"id": {
+	    "name": "USER ID",
 	    "data_type": "DT_Number",
 	    "conversion": "",
 	    "incremental": false,
@@ -45,8 +38,8 @@
                 "round_value": 0
 	    }
 	},
-	"name": {
-	    "name": "Name",
+	"firstname": {
+	    "name": "firstName",
 	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
@@ -59,8 +52,8 @@
                 "round_value": 0
 	    }
 	},
-	"make": {
-	    "name": "Make",
+	"lastname": {
+	    "name": "LastName",
 	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
@@ -73,9 +66,9 @@
                 "round_value": 0
 	    }
 	},
-	"position": {
-	    "name": "Position",
-	    "data_type": "DT_CoordD",
+	"weight": {
+	    "name": "Weight in kg",
+	    "data_type": "DT_kgWeight",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -87,9 +80,9 @@
                 "round_value": 0
 	    }
 	},
-	"speed": {
-	    "name": "Speed",
-	    "data_type": "DT_kmhSpeed",
+	"height": {
+	    "name": "Height in m",
+	    "data_type": "DT_Number",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -101,9 +94,9 @@
                 "round_value": 0
 	    }
 	},
-	"odometer": {
-	    "name": "Odometer",
-	    "data_type": "DT_kMeter",
+	"fat_free_mass": {
+	    "name": "fat_free_mass",
+	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -115,9 +108,9 @@
                 "round_value": 0
 	    }
 	},
-	"battery_voltage": {
-	    "name": "Battery Voltage",
-	    "data_type": "DT_Volt",
+	"fat_ratio": {
+	    "name": "fat ratio",
+	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -129,9 +122,9 @@
                 "round_value": 0
 	    }
 	},
-	"fuel_level": {
-	    "name": "Fuel Level",
-	    "data_type": "DT_VolumeLiter",
+	"fat_mass_weight": {
+	    "name": "fat mass weight",
+	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -143,8 +136,8 @@
                 "round_value": 0
 	    }
 	},
-	"lock_status": {
-	    "name": "Lock Status",
+	"diastolic_blood_pressure": {
+	    "name": "diastolic blood pressure",
 	    "data_type": "DT_OpenClose",
 	    "conversion": "",
 	    "incremental": false,
@@ -157,9 +150,23 @@
                 "round_value": 0
 	    }
 	},
-	"ignition_status": {
-	    "name": "Ignition Status",
-	    "data_type": "DT_Switch",
+	"systolic_blood_pressure": {
+	    "name": "systolic blood pressure",
+	    "data_type": "DT_String",
+	    "conversion": "",
+	    "incremental": false,
+	    "timeout": 0,
+	    "history": {
+		"store": true,
+		"duplicate": false,
+                "max": 0,
+                "expire": 0,
+                "round_value": 0
+	    }
+	},
+	"heart_pulse": {
+	    "name": "heart pulse",
+	    "data_type": "DT_String",
 	    "conversion": "",
 	    "incremental": false,
 	    "timeout": 0,
@@ -174,29 +181,29 @@
     },
     "xpl_stats": {},
     "device_types": {
-	"xee.car": {
-	    "id": "xee.car",
-	    "description": "Xee Car",
-	    "name": "Xee car",
+	"withing.user": {
+	    "id": "withing.user",
+	    "description": "Withing user",
+	    "name": "Withing user",
 	    "commands": [],
-	    "sensors": ["name", "carid", "make"],
+	    "sensors": ["lastname", "id", "firstname"],
 	    "parameters": [{
-		"key": "carid",
+		"key": "userid",
 		"xpl": false,
-		"description": "carid of the car",
+		"description": "userid of the user",
 		"type": "integer"
 	    }]
 	},
-	"xee.car.status": {
-	    "id": "xee.car.status",
-	    "description": "Xee Car status",
-	    "name": "Xee car status",
+	"withing.measure": {
+	    "id": "withing.measure",
+	    "description": "Withing user measure",
+	    "name": "Withing user measure",
 	    "commands": [],
-	    "sensors": ["position", "speed", "odometer", "battery_voltage", "fuel_level", "lock_status", "ignition_status"],
+	    "sensors": ["weight", "height", "fat_free_mass", "fat_ratio", "fat_mass_weight", "diastolic_blood_pressure", "systolic_blood_pressure", "heart_pulse"],
 	    "parameters": [{
-		"key": "carid",
+		"key": "userid",
 		"xpl": false,
-		"description": "carid of the car",
+		"description": "userid to get measure",
 		"type": "integer"
 	    }]
 	}
@@ -204,14 +211,14 @@
     "identity": {
 	"author": "tikismoke",
 	"author_email": "new.domodroid at gmail.com",
-	"tags": ["xee, cloud, car"],
+	"tags": ["withing, cloud"],
 	"dependencies": [{
-	    "id": "xee-sdk-python (>=3.0.1)",
+	    "id": "python-withings (>=0.3)",
 	    "type": "python"
 	}],
-	"description": "Plugin for XeeConnect car device",
+	"description": "Plugin for withing device",
 	"domogik_min_version": "0.5.0",
-	"name": "xeedevice",
+	"name": "withingdevice",
 	"type": "plugin",
 	"version": "0.1"
     },

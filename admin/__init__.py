@@ -27,32 +27,37 @@ except ImportError:
     pass
 
 ### plugin specific imports
-from xee import Xee
-import xee.entities as xee_entities
+import requests
+from requests_oauthlib import OAuth1
+import withings
+from withings import WithingsAuth, WithingsApi
 
 #TODO
 #from domogik_packages.plugin_xeedevice.bin.xeedevice import TOKEN_SAV
 
 ### package specific functions
 
-def get_token_link(xee_client_id,xee_client_secret,xee_redirect_url):
-    xee = Xee(client_id = xee_client_id,
-              client_secret = xee_client_secret,
-              redirect_uri = xee_redirect_url)
-    login_url = xee.get_authentication_url() + "&redirect_uri=" + xee_redirect_url
-    login_url = unicode(login_url, 'utf-8')
-    return login_url
+def get_auth(CONSUMER_KEY,CONSUMER_SECRET):
+    auth = WithingsAuth(CONSUMER_KEY, CONSUMER_SECRET)
+    return auth
 
-def generate_token_file(authorization_code,xee_client_id,xee_client_secret,xee_redirect_url):
-    xee = Xee(client_id = xee_client_id,
-              client_secret = xee_client_secret,
-              redirect_uri = xee_redirect_url)
-    token , error = xee.get_token_from_code(authorization_code)
-    if error != None :
-        flash(gettext(u"Error while getting token from Xee code check you client id/secret redirect url or code"),"error")
+def get_authorize_url(auth):
+    authorize_url = auth.get_authorize_url()
+    oauth_token = auth.oauth_token
+    oauth_secret = auth.oauth_secret
+    return authorize_url
+
+def generate_token_file(auth,oauth_token,oauth_secret,oauth_verifier):
+    auth.set_oauth.token = oauth_token
+    auth.set_oauth.secret = oauth_secret
+    creds = auth.get_credentials(oauth_verifier)
+    client = WithingsApi(creds)
+    user = client.get_user()
+    if user == None :
+        flash(gettext(u"Error while getting token from Withign code check you client id/secret redirect url or code"),"error")
     else:
-        with open(xee_config_file, 'w') as xee_token_file:
-            pickle.dump(token, xee_token_file)
+        with open(withing_config_file, 'w') as withing_token_file:
+            pickle.dump(creds, withing_token_file)
             flash(gettext(u"Successfully generate token. Please restart the plugin."), "success")
 
 
@@ -99,31 +104,31 @@ class CodeForm(Form):
     code = StringField("code")
 
 ### common tasks
-package = "plugin_xeedevice"
+package = "plugin_withingdevice"
 template_dir = "{0}/{1}/admin/templates".format(get_packages_directory(), package)
 static_dir = "{0}/{1}/admin/static".format(get_packages_directory(), package)
 geterrorlogcmd = "{0}/{1}/admin/geterrorlog.sh".format(get_packages_directory(), package)
 
 #TODO
 #xee_config_file = os.path.join(get_data_files_directory_for_plugin("xeedevice"), TOKEN_SAV)
-xee_config_file = os.path.join(os.path.dirname(__file__), '../data/xee_token.sav')
+withing_config_file = os.path.join(os.path.dirname(__file__), '../data/withings.json')
 
-
-plugin_xeedevice_adm = Blueprint(package, __name__,
+plugin_withingdevice_adm = Blueprint(package, __name__,
                         template_folder = template_dir,
                         static_folder = static_dir)
 
 
-@plugin_xeedevice_adm.route('/<client_id>', methods = ['GET', 'POST'])
+@plugin_withingdevice_adm.route('/<client_id>', methods = ['GET', 'POST'])
 def index(client_id):
     detail = get_client_detail(client_id)
     form = CodeForm()
-    xee_client_id = str(detail['data']['configuration'][1]['value'])
-    xee_client_secret = str(detail['data']['configuration'][2]['value'])
-    xee_redirect_url = str(detail['data']['configuration'][3]['value'])
+    withing_client_id = str(detail['data']['configuration'][1]['value'])
+    withing_client_secret = str(detail['data']['configuration'][2]['value'])
+    auth = get_auth(withing_client_id, withing_client_secret)
 
     if request.method == "POST":
-        generate_token_file(form.code.data,xee_client_id,xee_client_secret,xee_redirect_url)
+        print auth
+        generate_token_file(auth,form.code.data)
 
     try:
         return render_template('plugin_xeedevice.html',
@@ -131,12 +136,11 @@ def index(client_id):
             client_detail = detail,
             mactive = "clients",
             active = 'advanced',
-            get_token_url = get_token_link(xee_client_id,xee_client_secret,xee_redirect_url),
+            get_token_url= get_authorize_url(auth),
             form = form,
-            car_id = get_car_list(xee_client_id,xee_client_secret,xee_redirect_url),
-            current_token = show_current_token(),
+#            car_id = get_car_list(withing_client_id,withing_client_secret),
+#            current_token = show_current_token(),
             errorlog = get_info_from_log(geterrorlogcmd))
 
     except TemplateNotFound:
         abort(404)
-
