@@ -14,7 +14,7 @@ mysql:
   encoding: utf8
 env:
   DMG_BRANCH=develop
-  DMG_PLUGIN=xeedevice
+  DMG_PLUGIN=withingdevice
 install:
   - cd ~
   - git clone https://github.com/domogik/domogik.git
