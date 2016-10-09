@@ -14,15 +14,11 @@ Last change
 
 Purpose
 =======
-This Domogik plugin XeeDevices allow user to see informations from xee API (Car/Car.status).
+This Domogik plugin WithingDevices allow user to see informations from withing API (user/measures).
 
-You Need to create a Xee dev account here https://dev.xee.com/register and create an apps.
+You Need to create a withing dev account here https://oauth.withings.com/partner/add and create an application.
 
-In redirect url don't forget to put http://localhost and for Scopes select all.
-
-Here is an the related docs from xee apidoc: https://dev.xee.com/doc/setup/README.html
-
-Save your apps Id and Secret. You will need them later to configure the plugin.
+Save your Api key and Api Secret. You will need them later to configure the plugin.
 
 
 Plugin configuration
@@ -36,11 +32,9 @@ In Domogik administration section, go to client plugin-xeedevice details page.
 +================+======================+===============================================================================+
 | startup-plugin | false                | Automatically start plugin at Domogik startup                                 |
 +----------------+----------------------+-------------------------------------------------------------------------------+
-| client_id      |                      | Your Xee dev client-id                                                        |
+| api key        |                      | Your Application api_key                                                      |
 +----------------+----------------------+-------------------------------------------------------------------------------+
-| client_secret  |                      | Your Xee dev client-secret                                                    |
-+----------------+----------------------+-------------------------------------------------------------------------------+
-| redirect_url   | http://localhost     | Your Xee dev redirect_url                                                     |
+| api secret     |                      | Your Application api_secret                                                   |
 +----------------+----------------------+-------------------------------------------------------------------------------+
 | period         | 300                  | Refresh period from Xee API platform in seconds                               |
 +----------------+----------------------+-------------------------------------------------------------------------------+
@@ -54,36 +48,19 @@ In section **"Generating a Code for Token"** open th proposed link in a new tab 
 
 Paste the code in the input and clic on genrate token file.
 
-Creating devices for xee device
--------------------------------
-In clients page of admin UI, go to **plugin-xeedevice-<your_host_domogik>**, select tab **"Devices"**, **"New"** to create your devices.
+Creating devices for withing device
+-----------------------------------
+In clients page of admin UI, go to **plugin-withingdevice-<your_host_domogik>**, select tab **"Devices"**, **"New"** to create your devices.
 
 Chose one way creation by product or device type.
 
-device_types : car
-******************
-
-+-------------------+-------------------+------------------------------------------------------------------------------+
-| Key               | Example           | Description                                                                  |
-+===================+===================+==============================================================================+
-| Device name       | my Car            | The display name for this device.                                            |
-+-------------------+-------------------+------------------------------------------------------------------------------+
-| Description       | What you want     | A short description for this device.                                         |
-+-------------------+-------------------+------------------------------------------------------------------------------+
-| Reference         | What you want     | A Reference for this device.                                                 |
-+-------------------+-------------------+------------------------------------------------------------------------------+
-
-+-------------------+-------------------+------------------------------------------------------------------------------+
-| carid             | 10000             | Id of a car from you xee account. See advanced page to get all Car Id        |
-+-------------------+-------------------+------------------------------------------------------------------------------+
-
-device_types : car.position
+device_types : withing.user
 ***************************
 
 +-------------------+-------------------+------------------------------------------------------------------------------+
 | Key               | Example           | Description                                                                  |
 +===================+===================+==============================================================================+
-| Device            | Car position      | The display name for this device.                                            |
+| Device name       | USer one          | The display name for this device.                                            |
 +-------------------+-------------------+------------------------------------------------------------------------------+
 | Description       | What you want     | A short description for this device.                                         |
 +-------------------+-------------------+------------------------------------------------------------------------------+
@@ -91,5 +68,22 @@ device_types : car.position
 +-------------------+-------------------+------------------------------------------------------------------------------+
 
 +-------------------+-------------------+------------------------------------------------------------------------------+
-| carid             | 10000             | Should be the id of a car from you xee account                               |
+| userid            | 10000             | Id of a user from you withing. See advanced page to get User Id              |
++-------------------+-------------------+------------------------------------------------------------------------------+
+
+device_types : withing.measure
+******************************
+
++-------------------+-------------------+------------------------------------------------------------------------------+
+| Key               | Example           | Description                                                                  |
++===================+===================+==============================================================================+
+| Device name       | User one measure  | The display name for this device.                                            |
++-------------------+-------------------+------------------------------------------------------------------------------+
+| Description       | What you want     | A short description for this device.                                         |
++-------------------+-------------------+------------------------------------------------------------------------------+
+| Reference         | What you want     | A Reference for this device.                                                 |
++-------------------+-------------------+------------------------------------------------------------------------------+
+
++-------------------+-------------------+------------------------------------------------------------------------------+
+| userid            | 10000             | Id of a user from you withing. See advanced page to get User Id              |
 +-------------------+-------------------+------------------------------------------------------------------------------+

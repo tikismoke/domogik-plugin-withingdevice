@@ -6,5 +6,5 @@ Table Of Content
 
 .. toctree::
 
-    /plugin_xeedevice
+    /plugin_withingdevice
     /changelog
