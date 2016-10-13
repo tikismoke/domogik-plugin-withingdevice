@@ -9,14 +9,14 @@
                 <div class="panel-body">
                         <p>{% trans %}Open this link into a new navigation window, filll you withing user account and give you authorisation to use it:{% endtrans %}</p>
                         <pre>{{ get_token_url }}</pre>
-                        <a target="_blank" href="{{ get_token_url }}" class="btn btn-defautl"> Open this link in a new window to get your code!</a>
+                        <a target="_blank" href="{{ get_token_url }}" class="btn btn-defautl"> Open this link in a new window to get your oauth_verifier!</a>
                         <p></p>
                         <p>{% trans %}This will return you to page to validate Oauth and account you want acces.{% endtrans %}</p>
     	                <p>{% trans %}Put the value after oauth_verifier= here to generate and save a token file in data.{% endtrans %}</p>
                         <form method="POST">
                             <div class="form-group">
-				<label for="usr">Code:</label>
-				<input type="text" class="form-control" id= {{form.code}}
+				<label for="verifier">oauth_verifier=:</label>
+				<input type="text" class="form-control" id= {{form.verifier}}
                             </div>
                             <button class="btn btn-info" type="submit">{% trans %}Generate token file{% endtrans %}</button>
                         <p>{% trans %}You will need to restart plugin after generating the token file.{% endtrans %}</p>

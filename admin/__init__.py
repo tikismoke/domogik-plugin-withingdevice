@@ -39,27 +39,81 @@ from withings import WithingsAuth, WithingsApi
 
 def get_auth(CONSUMER_KEY,CONSUMER_SECRET):
     auth = WithingsAuth(CONSUMER_KEY, CONSUMER_SECRET)
+    with open(withing_temp_file, 'w') as withing_auth_file:
+        pickle.dump(auth, withing_auth_file)
     return auth
 
 def get_authorize_url(auth):
     authorize_url = auth.get_authorize_url()
-    oauth_token = auth.oauth_token
-    oauth_secret = auth.oauth_secret
+    with open(withing_temp_file, 'w') as withing_auth_file:
+        pickle.dump(auth, withing_auth_file)
     return authorize_url
 
-def generate_token_file(auth,oauth_token,oauth_secret,oauth_verifier):
-    auth.set_oauth.token = oauth_token
-    auth.set_oauth.secret = oauth_secret
+def generate_token_file(oauth_verifier):
+    with open(withing_temp_file, 'r') as withing_auth_file:
+        auth = pickle.load(withing_auth_file)
     creds = auth.get_credentials(oauth_verifier)
     client = WithingsApi(creds)
     user = client.get_user()
     if user == None :
-        flash(gettext(u"Error while getting token from Withign code check you client id/secret redirect url or code"),"error")
+        flash(gettext(u"Error while getting token from Withign code check you client id/secret redirect url or oauth_verifier"),"error")
     else:
-        with open(withing_config_file, 'w') as withing_token_file:
+        withing_user_file = os.path.join(os.path.dirname(__file__), '../data/'+creds.user_id+'-withings.json')
+        with open(withing_user_file, 'w') as withing_token_file:
             pickle.dump(creds, withing_token_file)
             flash(gettext(u"Successfully generate token. Please restart the plugin."), "success")
 
+class CodeForm(Form):
+    verifier = StringField("verifier")
+
+### common tasks
+package = "plugin_withingdevice"
+template_dir = "{0}/{1}/admin/templates".format(get_packages_directory(), package)
+static_dir = "{0}/{1}/admin/static".format(get_packages_directory(), package)
+geterrorlogcmd = "{0}/{1}/admin/geterrorlog.sh".format(get_packages_directory(), package)
+
+#TODO
+#xee_config_file = os.path.join(get_data_files_directory_for_plugin("xeedevice"), TOKEN_SAV)
+withing_config_file = os.path.join(os.path.dirname(__file__), '../data/withings.json')
+withing_temp_file = os.path.join(os.path.dirname(__file__), '../data/temp')
+
+plugin_withingdevice_adm = Blueprint(package, __name__,
+                        template_folder = template_dir,
+                        static_folder = static_dir)
+
+
+@plugin_withingdevice_adm.route('/<client_id>', methods = ['GET', 'POST'])
+def index(client_id):
+    detail = get_client_detail(client_id)
+    form = CodeForm()
+    withing_client_id = str(detail['data']['configuration'][1]['value'])
+    withing_client_secret = str(detail['data']['configuration'][2]['value'])
+
+    if request.method == "POST":
+        generate_token_file(form.verifier.data)
+        with open(withing_temp_file, 'r') as withing_auth_file:
+            auth = pickle.load(withing_auth_file)
+    else :
+        try:
+            auth = get_auth(withing_client_id, withing_client_secret)
+        except:
+            flash(gettext(u"Plugin not configured."), "error")
+            abort(404)
+
+    try:
+        return render_template('plugin_withingdevice.html',
+            clientid = client_id,
+            client_detail = detail,
+            mactive = "clients",
+            active = 'advanced',
+            get_token_url= get_authorize_url(auth),
+            form = form,
+#            car_id = get_car_list(withing_client_id,withing_client_secret),
+#            current_token = show_current_token(),
+            errorlog = get_info_from_log(geterrorlogcmd))
+
+    except TemplateNotFound:
+        abort(404)
 
 def get_car_list(client_id,client_secret,redirect_url):
     xee = Xee(client_id = client_id,
@@ -99,48 +153,3 @@ def get_info_from_log(cmd):
     if isinstance(output, str):
         output = unicode(output, 'utf-8')
     return output
-
-class CodeForm(Form):
-    code = StringField("code")
-
-### common tasks
-package = "plugin_withingdevice"
-template_dir = "{0}/{1}/admin/templates".format(get_packages_directory(), package)
-static_dir = "{0}/{1}/admin/static".format(get_packages_directory(), package)
-geterrorlogcmd = "{0}/{1}/admin/geterrorlog.sh".format(get_packages_directory(), package)
-
-#TODO
-#xee_config_file = os.path.join(get_data_files_directory_for_plugin("xeedevice"), TOKEN_SAV)
-withing_config_file = os.path.join(os.path.dirname(__file__), '../data/withings.json')
-
-plugin_withingdevice_adm = Blueprint(package, __name__,
-                        template_folder = template_dir,
-                        static_folder = static_dir)
-
-
-@plugin_withingdevice_adm.route('/<client_id>', methods = ['GET', 'POST'])
-def index(client_id):
-    detail = get_client_detail(client_id)
-    form = CodeForm()
-    withing_client_id = str(detail['data']['configuration'][1]['value'])
-    withing_client_secret = str(detail['data']['configuration'][2]['value'])
-    auth = get_auth(withing_client_id, withing_client_secret)
-
-    if request.method == "POST":
-        print auth
-        generate_token_file(auth,form.code.data)
-
-    try:
-        return render_template('plugin_xeedevice.html',
-            clientid = client_id,
-            client_detail = detail,
-            mactive = "clients",
-            active = 'advanced',
-            get_token_url= get_authorize_url(auth),
-            form = form,
-#            car_id = get_car_list(withing_client_id,withing_client_secret),
-#            current_token = show_current_token(),
-            errorlog = get_info_from_log(geterrorlogcmd))
-
-    except TemplateNotFound:
-        abort(404)
