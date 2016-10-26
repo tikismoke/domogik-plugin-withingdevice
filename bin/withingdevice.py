@@ -63,6 +63,7 @@ class withingManager(Plugin):
         api_secret = str(self.get_config('api_secret'))
         period = int(self.get_config('period'))
 
+	pathData = str(self.get_data_files_directory()) # force str type for path data
 
         # ### get the devices list
         # for this plugin, if no devices are created we won't be able to use devices.
@@ -75,7 +76,7 @@ class withingManager(Plugin):
 
     # ### Open the wihting lib
         try:
-            self.WITHINGclass = WITHINGclass(self.log, api_key, api_secret, period)
+            self.WITHINGclass = WITHINGclass(self.log, api_key, api_secret, period, dataPath = pathData)
         except withingException as e:
             self.log.error(e.value)
             self.force_leave()

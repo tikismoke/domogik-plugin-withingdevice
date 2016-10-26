@@ -66,7 +66,7 @@ class WITHINGclass:
     Get informations about withing
     """
     # -------------------------------------------------------------------------------------------------
-    def __init__(self, log, api_id, api_secret, period):
+    def __init__(self, log, api_id, api_secret, period, dataPath):
         try:
             """
             Create a withing instance, allowing to use withing api
@@ -76,6 +76,20 @@ class WITHINGclass:
             self.api_secret = api_secret
             self.period = period
 	    self._sensors = []
+
+	    self._dataPath = dataPath 
+
+            if not os.path.exists(self._dataPath) :
+                self._log.info(u"Directory data not exist, trying create : %s" , self._dataPath)
+                try :
+                    os.mkdir(self._dataPath)
+                    self._log.info(u"Withings data directory created : %s"  %self._dataPath)
+                except Exception as e:
+                    self._log.error(e.message)
+                    raise withingException ("Withings data directory not exist : %s" % self._dataPath)
+	    if not os.access(self._dataPath, os.W_OK) :
+                self._log.error("User %s haven't write access on data directory : %s"  %(user,  self._dataPath))
+    	        raise withingException ("User %s haven't write access on data directory : %s"  %(user,  self._dataPath))
 
             self.withing_config_file = os.path.join(os.path.dirname(__file__), '../data/withings.json')
 	    self.auth = WithingsAuth(self.api_id, self.api_secret)
